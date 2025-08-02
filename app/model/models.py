@@ -1,0 +1,93 @@
+from datetime import datetime
+from enum import Enum
+
+from sqlalchemy import String, Boolean, Integer, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.core.database import Base
+from sqlalchemy import Enum as SQLEnum
+
+
+
+class OrderStatus(str, Enum):
+    NEW = "new"
+    PAID = "paid"
+    PROCESSING = "processing"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+    RETURNED = "returned"
+    FAILED = "failed"
+
+
+
+
+class User(Base):
+    __tablename__ = 'user'
+    name: Mapped[str] = mapped_column(String,nullable=True,unique=False)
+    email: Mapped[str] = mapped_column(String,nullable=True,unique=False)
+    hashed_password: Mapped[str] = mapped_column(String)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class Category(Base):
+    __tablename__ = 'category'
+    name: Mapped[str] = mapped_column(String,nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=False)
+
+
+class Product(Base):
+    __tablename__ = 'product'
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=False)
+    price: Mapped[int] = mapped_column(Integer,nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer,nullable=False, default=1) # количество
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+class CartItem(Base):
+    # карзина пользователя
+
+    __tablename__ = 'cartitem'
+    user_id : Mapped[int] = mapped_column(ForeignKey("user.id"))
+    product_id : Mapped[int] = mapped_column(ForeignKey("product.id"))
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1) # что указывать после инта
+
+class Order(Base):
+    __tablename__ = 'order'
+    user_id : Mapped[int] = mapped_column(ForeignKey("user.id"))
+    status: Mapped[OrderStatus] = mapped_column(
+        SQLEnum(OrderStatus),
+        default=OrderStatus.NEW
+    )
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class OrderItems(Base):
+    __tablename__ = 'orderitem'
+    order_id: Mapped[int] = mapped_column(ForeignKey("order.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer)
+    price_at_order: Mapped[int] = mapped_column(Integer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
