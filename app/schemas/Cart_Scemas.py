@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class CartBase(BaseModel):
     product_id: int
     quantity: int
@@ -8,9 +9,10 @@ class CartBase(BaseModel):
 class CartCreate(CartBase):
     pass
 
+
 class CartOut(CartBase):
     id: int
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
