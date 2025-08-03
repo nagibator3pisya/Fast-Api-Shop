@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -68,13 +69,12 @@ async def delete_category(category_id: int,session: AsyncSession):
     result = await session.execute(select(Category).where(Category.id == category_id))
     category = result.scalar_one_or_none()
 
-    if not category:
-        return None
+    if category is None:
+        raise HTTPException(status_code=404, detail="Категория не найдена")
 
     await session.delete(category)
     await session.commit()
-    return {"detail": "Категория удалена"}
-
+    return {"message": "Категория и все её продукты удалены"}
 
 
 
