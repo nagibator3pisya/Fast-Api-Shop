@@ -13,7 +13,7 @@ admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
 @admin_router.post('/add_categories/')
 async def add_categories(add_categories: CategoryCreate, session: AsyncSession = Depends(get_db)):
-    return await service_admins.add_category(schemas_add=add_categories, session=session)
+    return await service_admins.add_category(schemas_add=add_categories,session=session)
 
 
 @admin_router.put('/update_categories/{id_category}/')
@@ -26,8 +26,7 @@ async def update_categories(id_category: int, categoryes: CategoryUpdate, sessio
 
 @admin_router.post('/add_products/')
 async def add_products(product_schemas: ProductCreate, session: AsyncSession = Depends(get_db)):
-    add_product = service_admins.add_products(product_schemas=product_schemas, session=session)
-    return add_product
+    return await service_admins.add_products(schemas_add=product_schemas, session=session)
 
 
 @admin_router.put('/update_products/{id_products}/')
