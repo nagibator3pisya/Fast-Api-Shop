@@ -6,13 +6,13 @@ from pydantic import BaseModel
 
 class ProductBase(BaseModel):
     name: str
-    descriptions: str
+    description: str
     price: int
     quantity: int
     category_id: int
 
 
-class ProductCreate(BaseModel):
+class ProductCreate(ProductBase):
     pass
 
 
