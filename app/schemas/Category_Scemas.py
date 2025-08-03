@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -8,6 +10,11 @@ class CategoryBase(BaseModel):
 
 class CategoryCreate(CategoryBase):
     pass
+
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    descriptions: Optional[str] = None
 
 
 class CategoryOut(CategoryBase):
