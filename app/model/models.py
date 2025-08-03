@@ -1,8 +1,9 @@
 from datetime import datetime
 from enum import Enum
+from typing import List
 
 from sqlalchemy import String, Boolean, Integer, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from sqlalchemy import Enum as SQLEnum
@@ -31,9 +32,19 @@ class User(Base):
 
 
 class Category(Base):
+    """
+    passive_deletes=True
+    SQLAlchemy не будет загружать дочерние объекты, а просто доверит каскад базе
+    """
     __tablename__ = 'category'
     name: Mapped[str] = mapped_column(String,nullable=False)
     description: Mapped[str] = mapped_column(String, nullable=False)
+
+    products: Mapped[List["Product"]] = relationship(
+        back_populates="category",
+        cascade="all, delete-orphan",  # каскад на уровне ORM
+        passive_deletes=True
+    )
 
 
 class Product(Base):
@@ -43,6 +54,15 @@ class Product(Base):
     price: Mapped[int] = mapped_column(Integer,nullable=False)
     quantity: Mapped[int] = mapped_column(Integer,nullable=False, default=1) # количество
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("category.id", ondelete="CASCADE"),  # каскадное удаление
+        nullable=False
+    )
+
+    category: Mapped["Category"] = relationship(back_populates="products")
+
+
 
 class CartItem(Base):
     # карзина пользователя
