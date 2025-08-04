@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.api.admin import admin_router
+from app.api.category import category_router
 from app.api.product import product_router
 
 app = FastAPI()
@@ -14,6 +15,7 @@ app = FastAPI()
 # app.include_router(orders.router, prefix="/orders", tags=["orders"])
 app.include_router(admin_router)
 app.include_router(product_router)
+app.include_router(category_router)
 
 
 
