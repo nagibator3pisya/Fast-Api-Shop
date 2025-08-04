@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.util import await_only
 
 from app.deps.dependes import get_db
-from app.schemas.Category_Scemas import CategoryCreate, CategoryUpdate
-from app.schemas.Product_Scemas import ProductCreate, ProductUpdate
+from app.schemas.Category import CategoryCreate, CategoryUpdate
+from app.schemas.Product import ProductCreate, ProductUpdate
 from app.services import service_admins
 
 admin_router = APIRouter(prefix="/admin", tags=["admin"])

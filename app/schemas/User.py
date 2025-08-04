@@ -12,7 +12,7 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserOut(BaseModel):
+class UserOut(UserBase):
     id: int
     is_active: bool
 
