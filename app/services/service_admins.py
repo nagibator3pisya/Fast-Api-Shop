@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.model.models import Category, Product
-from app.schemas.Category_Scemas import CategoryCreate, CategoryUpdate
-from app.schemas.Product_Scemas import ProductCreate, ProductUpdate
+from app.schemas.Category import CategoryCreate, CategoryUpdate
+from app.schemas.Product import ProductCreate, ProductUpdate
 
 
 async def add_category(schemas_add: CategoryCreate, session: AsyncSession):
