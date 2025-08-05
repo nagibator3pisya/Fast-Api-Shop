@@ -25,8 +25,8 @@ class OrderStatus(str, Enum):
 
 class User(Base):
     __tablename__ = 'user'
-    name: Mapped[str] = mapped_column(String,nullable=True,unique=False)
-    email: Mapped[str] = mapped_column(String,nullable=True,unique=False)
+    name: Mapped[str] = mapped_column(String, nullable=True, unique=False)
+    email: Mapped[str] = mapped_column(String, nullable=True, unique=False)
     hashed_password: Mapped[str] = mapped_column(String)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
@@ -68,13 +68,14 @@ class CartItem(Base):
     # карзина пользователя
 
     __tablename__ = 'cartitem'
-    user_id : Mapped[int] = mapped_column(ForeignKey("user.id"))
-    product_id : Mapped[int] = mapped_column(ForeignKey("product.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"))
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1) # что указывать после инта
+
 
 class Order(Base):
     __tablename__ = 'order'
-    user_id : Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     status: Mapped[OrderStatus] = mapped_column(
         SQLEnum(OrderStatus),
         default=OrderStatus.NEW
