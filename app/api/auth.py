@@ -44,13 +44,13 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-def verify_token(token:str, credentials_exception):
+def verify_token(token: str, credentials_exception):
     try:
-        payload = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
-        username: str = payload.get('sub')
-        if username is None:
+        payload = jwt.decode(token,SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get('sub')
+        if email is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(email=email)
     except JWTError:
         raise credentials_exception
     return token_data
@@ -58,6 +58,7 @@ def verify_token(token:str, credentials_exception):
 
 async def authenticate_user(session: AsyncSession, email: str, password: str):
     user = await get_user_by_email(session=session, email=email)
+    print(user)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -73,7 +74,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: Session
     )
     token_data = verify_token(token, credentials_exception)
 
-    tests = await test(token_data=token_data, session=session)
+    tests = await test(token_data.email, session=session)
 
     if tests is None:
         raise credentials_exception
