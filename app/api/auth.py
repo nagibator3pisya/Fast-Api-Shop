@@ -13,7 +13,7 @@ from app.deps.dependes import get_db
 from app.model.models import User
 from app.schemas.Token import TokenData
 
-from app.services.service_auth import test, get_user_by_email
+from app.services.service_auth import search_email, get_user_by_email
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
@@ -38,7 +38,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.now() + expires_delta
     else:
         expire = datetime.now() + timedelta(minutes=15)
-
+    # expire = datetime.now() + (expires_delta or timedelta(minutes=15))
     to_encode.update({'exp': expire})
     encoded_jwt = jwt.encode(to_encode,SECRET_KEY,algorithm=ALGORITHM)
     return encoded_jwt
@@ -74,7 +74,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: Session
     )
     token_data = verify_token(token, credentials_exception)
 
-    tests = await test(token_data.email, session=session)
+    tests = await search_email(token_data.email, session=session)
 
     if tests is None:
         raise credentials_exception
