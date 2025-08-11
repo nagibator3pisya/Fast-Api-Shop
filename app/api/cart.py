@@ -8,7 +8,7 @@ from app.deps.dependes import get_db
 from app.model.models import User
 from app.schemas.CartItem import CartItemOut, CartItemCreate
 from app.services import service
-from app.services.service import remove_from_cart, changes_quantity_cart
+from app.services.service import remove_from_cart, changes_quantity_cart, create_order_from_cart
 
 cart_router = APIRouter(prefix="/cart", tags=["cart"])
 
@@ -44,8 +44,6 @@ async def change_quantity_cart(quantity_id: int,
 
 
 
-#
-#
-# @cart_router.post('/checkout/')
-# async def product_checkout():
-#     ...
+@cart_router.post('/checkout/')
+async def product_checkout(session: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return await create_order_from_cart(session=session, current_user=current_user)
