@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.model.models import Category, Product
+from app.model.models import Category, Product, User
 from app.schemas.Category import CategoryCreate, CategoryUpdate
 from app.schemas.Product import ProductCreate, ProductUpdate
 
@@ -78,6 +78,23 @@ async def delete_category(category_id: int,session: AsyncSession):
     return {"message": "Категория и все её продукты удалены"}
 
 
+async def add_admins(user_id: int, session: AsyncSession):
+    # Ищем пользователя
+    result = await session.execute(select(User).where(User.id == user_id))
+    target_user = result.scalar_one_or_none()
+
+
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    target_user.is_admin = True
+    await session.commit()
+
+    return {"message": f"Пользователь {target_user.email} теперь администратор"}
+
+
+
+
 async def restock_product(session: AsyncSession,
                           product_id: int,
                           quantity: int,
@@ -107,3 +124,5 @@ async def restock_product(session: AsyncSession,
         'new_quantity': product.quantity,
         "is_active": product.is_active
     }
+
+
