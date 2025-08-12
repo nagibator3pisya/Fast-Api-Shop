@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from itertools import product
 
 from fastapi import HTTPException
 from fastapi.params import Depends
@@ -31,11 +32,6 @@ async def my_cart_all(session: AsyncSession, current_user: User = Depends(get_cu
     return cart_all.scalars().all()
 
 
-'''
-    stmt = select(Task).where(Task.id == task_id, Task.owner_id == current_user.id)
-    result = await session.execute(stmt)
-    return result.scalars().first()
-'''
 
 
 async def add_to_cart(session: AsyncSession, schemas: CartItemCreate, user: User):
@@ -49,8 +45,7 @@ async def add_to_cart(session: AsyncSession, schemas: CartItemCreate, user: User
     if product.quantity < schemas.quantity:
         raise HTTPException(status_code=400, detail=f"На складе осталось {product.quantity} шт.")
 
-    # резервируем
-    product.quantity -= schemas.quantity
+
     cart_item = CartItem(
         product_id=schemas.product_id,
         quantity=schemas.quantity,
@@ -164,7 +159,15 @@ async def clear_expired_reservations(session: AsyncSession):
     await session.commit()
 
 
+
+
 async def create_order_from_cart(session: AsyncSession, current_user: User = Depends(get_current_user)):
+    '''
+    Оформление заказа
+    :param session:
+    :param current_user:
+    :return:
+    '''
     # # Получил карзиру пользователя
     # query = select(CartItem).where(CartItem.user_id == current_user.id)
     # result = await session.execute(query)
@@ -252,14 +255,18 @@ async def create_order_from_cart(session: AsyncSession, current_user: User = Dep
     for cart_item in cart_items:
         product = cart_item.product
 
-        if product.quantity < cart_item.quantity:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Товара '{product.name}' недостаточно на складе"
-            )
+        # if product.quantity < cart_item.quantity:
+        #     raise HTTPException(
+        #         status_code=400,
+        #         detail=f"Товара '{product.name}' недостаточно на складе"
+        #     )
 
         # Списываем товар со склада
         product.quantity -= cart_item.quantity
+
+        # Если закончился — деактивируем
+        if product.quantity <= 0:
+            product.is_active = False
 
         # Добавляем в order_items
         order_item = OrderItems(
