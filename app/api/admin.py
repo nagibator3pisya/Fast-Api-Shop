@@ -49,3 +49,10 @@ async def delete_product(id_product: int, session: AsyncSession = Depends(get_db
    delete = await service_admins.delete_product(product_id=id_product, session=session)
    return delete
 
+
+
+@admin_router.post('/restock_product/{product_id}/')
+async def restock_products(id_product: int, quantity: int,session:AsyncSession = Depends(get_db)):
+    restock = await service_admins.restock_product(session=session, product_id=id_product, quantity=quantity)
+    return restock
+
