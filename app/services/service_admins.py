@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from app.model.models import Category, Product
 from app.schemas.Category import CategoryCreate, CategoryUpdate
@@ -77,4 +78,32 @@ async def delete_category(category_id: int,session: AsyncSession):
     return {"message": "Категория и все её продукты удалены"}
 
 
+async def restock_product(session: AsyncSession,
+                          product_id: int,
+                          quantity: int,
+                          ):
+    if quantity <= 0:
+        raise HTTPException(status_code=400, detail='Количество должно быть больше 0')
 
+    product = await session.get(Product, product_id)
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Товар не найден"
+        )
+
+    # увеличение остатка
+    product.quantity += quantity
+
+    # Если был не активен и теперь есть остаток - вкл
+    if product.quantity > 0:
+        product.is_active = True
+
+    await session.commit()
+
+    return {
+        'detail': f'Товар "{product.name}" пополнен на {quantity} шт.',
+        'new_quantity': product.quantity,
+        "is_active": product.is_active
+    }
