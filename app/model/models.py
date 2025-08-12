@@ -1,8 +1,9 @@
 from datetime import datetime
 from enum import Enum
+from itertools import product
 from typing import List
 
-from sqlalchemy import String, Boolean, Integer, ForeignKey
+from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -29,6 +30,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, nullable=True, unique=False)
     hashed_password: Mapped[str] = mapped_column(String)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+    cart_items = relationship('CartItem',back_populates='user')
 
 
 class Category(Base):
@@ -62,15 +65,23 @@ class Product(Base):
 
     category: Mapped["Category"] = relationship(back_populates="products")
 
+    cart_items = relationship('CartItem', back_populates='product')
 
 
 class CartItem(Base):
-    # карзина пользователя
+    # карзина пользователя, расширить карзину
 
     __tablename__ = 'cartitem'
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     product_id: Mapped[int] = mapped_column(ForeignKey("product.id"))
-    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1) # что указывать после инта
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
+    reserved_until: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
+
+    product = relationship("Product", back_populates="cart_items")
+    user = relationship("User", back_populates="cart_items")
+
+
 
 
 class Order(Base):
@@ -82,7 +93,7 @@ class Order(Base):
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    order_items = relationship("OrderItems", back_populates="order", cascade="all, delete-orphan")
 
 class OrderItems(Base):
     __tablename__ = 'orderitem'
@@ -90,7 +101,7 @@ class OrderItems(Base):
     product_id: Mapped[int] = mapped_column(ForeignKey("product.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer)
     price_at_order: Mapped[int] = mapped_column(Integer)
-
+    order = relationship("Order", back_populates="order_items")
 
 
 
