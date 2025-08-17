@@ -89,17 +89,6 @@ async def refresh_token(refresh_token: str = Cookie(None)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# @aut_log.post("/login/", response_model=Token)
-# async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
-#     user = await authenticate_user(session, form_data.username, form_data.password)
-#     if not user:
-#         raise HTTPException(status_code=401, detail="Invalid credentials")
-#     access_token = create_access_token(data={"sub": user.email})
-#     return {"access_token": access_token, "token_type": "bearer"}
-
-
-
-
 
 
 @aut_log.get("/me", response_model=UserOut)

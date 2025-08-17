@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -27,8 +26,8 @@ settings = Settings()
 
 
 database_url = settings.get_db_url()
-print(database_url)
+# print(database_url)
 
 
-engine = create_async_engine(url=database_url)
-async_session_maker = async_sessionmaker(engine, class_=AsyncSession,expire_on_commit=False)
+engine = create_async_engine(settings.get_db_url(), echo=False)
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
