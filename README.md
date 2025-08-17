@@ -165,19 +165,19 @@ failed	        Ошибка при оплате или доставке
 | `GET` | `/admin/all_orders/` | Все заказы *(admin)* |
 
 
-# доп
-
-- ПИСЬМО НА ПОЧТУ фоновый режим
-
 
 
 ```bash
-# Установка зависимостей
-pip install -r requirements.txt
+cd Fast-Api-Shop
 
-# Инициализация БД
-alembic upgrade head
+# 2. Создаём .env
+cp .env.example .env
 
-# Запуск сервера
-uvicorn app.main:app --reload
+# 3. Поднимаем контейнеры
+docker-compose up --build
+
+# 4. Миграции
+docker-compose run web alembic upgrade head
 ```
+
+
